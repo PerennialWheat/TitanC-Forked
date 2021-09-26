@@ -6,8 +6,9 @@ find_package(RapidJSON CONFIG REQUIRED)
 find_package(LibXml2 CONFIG REQUIRED)
 
 file(GLOB SOURCES ${CMAKE_CURRENT_LIST_DIR}/TitanRewrite/*.cpp)
+file(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/*.h)
 
-add_executable(TitanC-Forked ${SOURCES})
+add_executable(TitanC-Forked ${SOURCES} ${HEADERS})
 
 target_link_libraries(TitanC-Forked PUBLIC CURL::libcurl)
 target_link_libraries(TitanC-Forked PUBLIC rapidjson)
