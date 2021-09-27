@@ -278,6 +278,7 @@ bool Roblox::getPricesFromCatalog(std::string& url, std::string cookie, std::map
       proxies.push_back(line);
     }
     isProxiesLoaded = true;
+    proxyFile.close();
   }
     curl_easy_setopt(curl, CURLOPT_PROXY, ("http://" + *select_randomly(proxies.begin(), proxies.end())).c_str());
     curl_easy_setopt(curl, CURLOPT_POST, 0);
