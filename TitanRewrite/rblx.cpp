@@ -19,6 +19,9 @@
 #include <random>
 #include <fstream>
 
+std::vector<std::string> proxies;
+bool isProxiesLoaded;
+
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp)
 {
 	((std::string*)userp)->append((char*)contents, size * nmemb);
@@ -267,8 +270,6 @@ bool Roblox::getPricesFromCatalog(std::string& url, std::string cookie, std::map
 	CURLcode res;
 	std::string content;
 	char* endurl;
-   static std::vector<std::string> proxies;
-   static bool isProxiesLoaded;
 
   if(!isProxiesLoaded) {
     std::ifstream proxyFile("proxies.txt");
@@ -278,16 +279,18 @@ bool Roblox::getPricesFromCatalog(std::string& url, std::string cookie, std::map
     }
     isProxiesLoaded = true;
   }
-	curl_easy_reset(curl);
-	curl_easy_setopt(curl, CURLOPT_PROXY, ("http://" + *(select_randomly(proxies.begin(), proxies.end()))).c_str());
-  curl_easy_setopt(curl, CURLOPT_POST, 0);
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallbackSnipe);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
-	res = curl_easy_perform(curl);
-
-	if (res == CURLE_WRITE_ERROR) {
+	if(curl) {
+    curl_easy_setopt(curl, CURLOPT_PROXY, ("http://" + *(select_randomly(proxies.begin(), proxies.end()))).c_str());
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+	  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+	  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+	  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallbackSnipe);
+	  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
+	  res = curl_easy_perform(curl);
+    std::cout << content << '\n';
+    std::cout << *(select_randomly(proxies.begin(), proxies.end())) << "sent request" << '\n';
+  }
+  if (res == CURLE_WRITE_ERROR) {
 		curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &endurl);
 		if (strcmp(endurl, url.c_str()) != 0) url = std::string(endurl);
 
