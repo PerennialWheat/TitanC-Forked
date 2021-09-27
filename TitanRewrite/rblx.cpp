@@ -279,14 +279,14 @@ bool Roblox::getPricesFromCatalog(std::string& url, std::string cookie, std::map
     }
     isProxiesLoaded = true;
   }
-    curl_easy_setopt(curl, CURLOPT_PROXY, ("http://" + *(select_randomly(proxies.begin(), proxies.end()))).c_str());
+    curl_easy_setopt(curl, CURLOPT_PROXY, ("http://" + *select_randomly(proxies.begin(), proxies.end())).c_str());
     curl_easy_setopt(curl, CURLOPT_POST, 0);
 	  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 	  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 	  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallbackSnipe);
 	  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
 	  res = curl_easy_perform(curl);
-  if (res == CURLE_WRITE_ERROR) {
+    if (res == CURLE_WRITE_ERROR) {
 		curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &endurl);
 		if (strcmp(endurl, url.c_str()) != 0) url = std::string(endurl);
 
