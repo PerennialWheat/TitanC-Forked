@@ -17,6 +17,7 @@
 #include <map>
 #include <curl/curl.h>
 #include <random>
+#include <fstream>
 
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp)
 {
@@ -266,9 +267,20 @@ bool Roblox::getPricesFromCatalog(std::string& url, std::string cookie, std::map
 	CURLcode res;
 	std::string content;
 	char* endurl;
+   static std::vector<std::string> proxies;
+   static bool isProxiesLoaded;
 
+  if(!isProxiesLoaded) {
+    std::ifstream proxyFile("proxies.txt");
+    std::string line;
+    while(std::getline(proxyFile, line)) {
+      proxies.push_back(line);
+    }
+    isProxiesLoaded = true;
+  }
 	curl_easy_reset(curl);
-	curl_easy_setopt(curl, CURLOPT_POST, 0);
+	curl_easy_setopt(curl, CURLOPT_PROXY, ("http://" + *(select_randomly(proxies.begin(), proxies.end()))).c_str());
+  curl_easy_setopt(curl, CURLOPT_POST, 0);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallbackSnipe);
